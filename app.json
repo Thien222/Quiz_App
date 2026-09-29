@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Nè Bạn Ơi",
+    "slug": "ne-ban-oi",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "nebanoi",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-router",
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "developmentClient": {
+      "silent": true
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

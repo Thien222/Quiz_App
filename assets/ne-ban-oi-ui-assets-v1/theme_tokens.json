@@ -1,0 +1,29 @@
+{
+  "colors": {
+    "background": "#FFF7F9",
+    "surface": "#FFFFFF",
+    "primaryPink": "#F472B6",
+    "primaryDarkPink": "#DB2777",
+    "lavender": "#A78BFA",
+    "purple": "#8B5CF6",
+    "peach": "#FDBA74",
+    "textPrimary": "#3B1C54",
+    "textSecondary": "#7E638D",
+    "textMuted": "#AFA0BA",
+    "borderPink": "#FCE7F3",
+    "borderPurple": "#F3E8FF",
+    "premiumGold": "#F59E0B"
+  },
+  "radii": {
+    "card": 26,
+    "smallCard": 20,
+    "button": 9999,
+    "modal": 30
+  },
+  "shadow": {
+    "color": "#F472B6",
+    "opacity": 0.15,
+    "radius": 12,
+    "offsetY": 6
+  }
+}

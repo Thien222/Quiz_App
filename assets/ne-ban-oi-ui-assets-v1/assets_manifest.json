@@ -1,0 +1,182 @@
+[
+  {
+    "name": "boy_pink_hoodie",
+    "category": "characters",
+    "png": "characters/boy_pink_hoodie.png",
+    "webp": "webp/characters/boy_pink_hoodie.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "couple_heart",
+    "category": "characters",
+    "png": "characters/couple_heart.png",
+    "webp": "webp/characters/couple_heart.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "girl_hug_bunny",
+    "category": "characters",
+    "png": "characters/girl_hug_bunny.png",
+    "webp": "webp/characters/girl_hug_bunny.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "girl_hug_heart",
+    "category": "characters",
+    "png": "characters/girl_hug_heart.png",
+    "webp": "webp/characters/girl_hug_heart.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "cute_star",
+    "category": "illustrations",
+    "png": "illustrations/cute_star.png",
+    "webp": "webp/illustrations/cute_star.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "gift_box_hearts",
+    "category": "illustrations",
+    "png": "illustrations/gift_box_hearts.png",
+    "webp": "webp/illustrations/gift_box_hearts.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "glossy_heart",
+    "category": "illustrations",
+    "png": "illustrations/glossy_heart.png",
+    "webp": "webp/illustrations/glossy_heart.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "heart_balloons",
+    "category": "illustrations",
+    "png": "illustrations/heart_balloons.png",
+    "webp": "webp/illustrations/heart_balloons.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "love_calendar",
+    "category": "illustrations",
+    "png": "illustrations/love_calendar.png",
+    "webp": "webp/illustrations/love_calendar.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "love_flag",
+    "category": "illustrations",
+    "png": "illustrations/love_flag.png",
+    "webp": "webp/illustrations/love_flag.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "love_letter_wings",
+    "category": "illustrations",
+    "png": "illustrations/love_letter_wings.png",
+    "webp": "webp/illustrations/love_letter_wings.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "premium_crown_alt",
+    "category": "illustrations",
+    "png": "illustrations/premium_crown_alt.png",
+    "webp": "webp/illustrations/premium_crown_alt.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "premium_crown_heart",
+    "category": "illustrations",
+    "png": "illustrations/premium_crown_heart.png",
+    "webp": "webp/illustrations/premium_crown_heart.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "premium_lock_wings",
+    "category": "illustrations",
+    "png": "illustrations/premium_lock_wings.png",
+    "webp": "webp/illustrations/premium_lock_wings.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "cta_kawaii",
+    "category": "buttons",
+    "png": "buttons/cta_kawaii.png",
+    "webp": "webp/buttons/cta_kawaii.webp",
+    "width": 2172,
+    "height": 724,
+    "transparent": true
+  },
+  {
+    "name": "cta_pastel",
+    "category": "buttons",
+    "png": "buttons/cta_pastel.png",
+    "webp": "webp/buttons/cta_pastel.webp",
+    "width": 2172,
+    "height": 724,
+    "transparent": true
+  },
+  {
+    "name": "cta_pink_arrow",
+    "category": "buttons",
+    "png": "buttons/cta_pink_arrow.png",
+    "webp": "webp/buttons/cta_pink_arrow.webp",
+    "width": 2172,
+    "height": 724,
+    "transparent": true
+  },
+  {
+    "name": "cta_pink_purple",
+    "category": "buttons",
+    "png": "buttons/cta_pink_purple.png",
+    "webp": "webp/buttons/cta_pink_purple.webp",
+    "width": 2172,
+    "height": 724,
+    "transparent": true
+  },
+  {
+    "name": "icon_back",
+    "category": "buttons",
+    "png": "buttons/icon_back.png",
+    "webp": "webp/buttons/icon_back.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  },
+  {
+    "name": "icon_share",
+    "category": "buttons",
+    "png": "buttons/icon_share.png",
+    "webp": "webp/buttons/icon_share.webp",
+    "width": 1254,
+    "height": 1254,
+    "transparent": true
+  }
+]
