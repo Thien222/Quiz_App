@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { colors, radius, shadows, spacing, typography } from '@/constants/theme';
 
 interface Props {
@@ -10,13 +11,15 @@ interface Props {
 }
 
 export function AppHeader({ title, eyebrow, onBack, onShare }: Props) {
+  const router = useRouter();
+
   return (
     <View style={styles.row}>
       {onBack ? (
         <Pressable
           accessibilityLabel="Quay lại"
           accessibilityRole="button"
-          onPress={onBack}
+          onPress={() => router.canGoBack() ? onBack() : router.replace('/(tabs)')}
           style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
         >
           <Ionicons name="chevron-back" size={20} color={colors.text} />
@@ -27,7 +30,7 @@ export function AppHeader({ title, eyebrow, onBack, onShare }: Props) {
 
       <View style={styles.copy}>
         {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
-        <Text numberOfLines={1} style={styles.title}>
+        <Text numberOfLines={2} style={styles.title}>
           {title}
         </Text>
       </View>
@@ -56,8 +59,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxs,
   },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.pill,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
@@ -71,10 +74,11 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   spacer: {
-    width: 40,
+    width: 44,
   },
   copy: {
     flex: 1,
+    minWidth: 0,
     alignItems: 'center',
     paddingHorizontal: spacing.xs,
   },

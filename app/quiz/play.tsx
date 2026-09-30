@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
+import { AppDialog } from '@/components/common/AppDialog';
+import { TextButton } from '@/components/common/Buttons';
 import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { QuizHeader } from '@/components/quiz/QuizHeader';
 import { QuizTag } from '@/components/quiz/QuizTag';
@@ -9,12 +10,16 @@ import { QuizHeroImage } from '@/components/quiz/QuizHeroImage';
 import { QuizOptionCard } from '@/components/quiz/QuizOptionCard';
 import { QuizFooterHint } from '@/components/quiz/QuizFooterHint';
 import { GradientCTAButton } from '@/components/common/GradientCTAButton';
+import { ScreenContainer } from '@/components/common/ScreenContainer';
 import { colors } from '@/constants/theme';
 import { useQuizStore } from '@/stores/useQuizStore';
 import { useUserStore } from '@/stores/useUserStore';
+import { useResponsiveLayout } from '@/utils/responsive';
 
 export default function QuizPlayScreen() {
   const router = useRouter();
+  const [showExit, setShowExit] = useState(false);
+  const { isSmallPhone } = useResponsiveLayout();
 
   const {
     activeQuestions,
@@ -58,105 +63,114 @@ export default function QuizPlayScreen() {
     if (currentIndex > 0) {
       prevQuestion();
     } else {
-      Alert.alert(
-        'Dừng bài trắc nghiệm?',
-        'Tiến trình câu hỏi hiện tại sẽ được lưu lại. Bạn có muốn quay về không?',
-        [
-          { text: 'Làm tiếp', style: 'cancel' },
-          { text: 'Quay về', style: 'destructive', onPress: () => router.back() },
-        ]
-      );
+      setShowExit(true);
     }
   };
 
   return (
-    <SafeAreaView style={styles.screen}>
-      <QuizHeader
-        current={currentIndex + 1}
-        total={activeQuestions.length}
-        onBack={handleBack}
-      />
-
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Animated Question Container (Ref: 03_quiz_food_scenario.png) */}
-        <Animated.View
-          key={question.id}
-          entering={FadeInRight.duration(280)}
-          exiting={FadeOutLeft.duration(200)}
-          style={styles.questionBlock}
-        >
-          {/* Category Tag */}
-          <QuizTag tag={question.tag} />
-
-          {/* Question Title */}
-          <View style={styles.titleWrap}>
-            <Text style={styles.questionText}>
-              {question.question}{' '}
-              {question.scenarioHighlight ? (
-                <Text style={styles.highlightText}>{question.scenarioHighlight}</Text>
-              ) : null}
-            </Text>
-          </View>
-
-          {/* Large Hero Illustration (Gender-Aware) */}
-          <QuizHeroImage heroImage={question.heroImage} />
-
-          {/* Option Cards with Radio Indicator on the left */}
-          <View style={styles.optionsWrap}>
-            {question.options.map((option) => (
-              <QuizOptionCard
-                key={option.id}
-                optionKey={option.label}
-                text={option.text}
-                thumbnail={option.thumbnail}
-                selected={currentSelectedOptionId === option.id}
-                onPress={() => selectAnswer(question.id, option.id)}
-              />
-            ))}
-          </View>
-
-          {/* Helper Footer Hint */}
-          <QuizFooterHint text={question.helperHint} />
-        </Animated.View>
-      </ScrollView>
-
-      {/* Fixed Sticky CTA Button */}
-      <View style={styles.footer}>
-        <GradientCTAButton
-          label={isLast ? 'Xem kết quả' : 'Tiếp tục'}
-          rightIcon={<Text style={styles.arrowIcon}>→</Text>}
-          disabled={!currentSelectedOptionId}
-          onPress={handleNext}
+    <ScreenContainer
+      scrollResetKey={question.id}
+      edges={['top', 'bottom']}
+      header={
+        <QuizHeader
+          current={currentIndex + 1}
+          total={activeQuestions.length}
+          onBack={handleBack}
         />
-      </View>
-    </SafeAreaView>
+      }
+      footer={
+        <View style={styles.footer}>
+          <GradientCTAButton
+            label={isLast ? 'Xem kết quả' : 'Tiếp tục'}
+            rightIcon={<Text style={styles.arrowIcon}>→</Text>}
+            disabled={!currentSelectedOptionId}
+            onPress={handleNext}
+          />
+        </View>
+      }
+      contentContainerStyle={styles.content}
+    >
+      {/* Animated Question Container (Ref: 03_quiz_food_scenario.png) */}
+      <Animated.View
+        key={question.id}
+        entering={FadeInRight.duration(280)}
+        exiting={FadeOutLeft.duration(200)}
+        style={styles.questionBlock}
+      >
+        {/* Category Tag */}
+        <QuizTag tag={question.tag} />
+
+        {/* Question Title */}
+        <View style={styles.titleWrap}>
+          <Text style={[styles.questionText, isSmallPhone && styles.questionTextSmall]}>
+            {question.question}{' '}
+            {question.scenarioHighlight ? (
+              <Text style={styles.highlightText}>{question.scenarioHighlight}</Text>
+            ) : null}
+          </Text>
+        </View>
+
+        {/* Large Hero Illustration (Gender-Aware, with aspectRatio) */}
+        <QuizHeroImage heroImage={question.heroImage} />
+
+        {/* Option Cards with Radio Indicator on the left */}
+        <View style={styles.optionsWrap}>
+          {question.options.map((option) => (
+            <QuizOptionCard
+              key={option.id}
+              optionKey={option.label}
+              text={option.text}
+              thumbnail={option.thumbnail}
+              selected={currentSelectedOptionId === option.id}
+              onPress={() => selectAnswer(question.id, option.id)}
+            />
+          ))}
+        </View>
+
+        {/* Helper Footer Hint */}
+        <QuizFooterHint text={question.helperHint} />
+      </Animated.View>
+      <AppDialog
+        visible={showExit}
+        title="Tạm dừng một chút?"
+        onClose={() => setShowExit(false)}
+        actions={
+          <>
+            <GradientCTAButton label="Làm tiếp" onPress={() => setShowExit(false)} />
+            <TextButton label="Về trang chủ" onPress={() => { setShowExit(false); router.replace('/(tabs)'); }} />
+          </>
+        }
+      >
+        <Text style={styles.dialogCopy}>Các lựa chọn hiện tại đã được lưu. Bạn có thể tiếp tục bài đang làm từ trang chủ.</Text>
+      </AppDialog>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  dialogCopy: { color: colors.textSecondary, fontSize: 15, lineHeight: 23 },
   content: {
-    paddingHorizontal: 18,
     paddingTop: 4,
-    paddingBottom: 24,
+    paddingBottom: 16,
   },
   questionBlock: {
-    gap: 12,
+    gap: 10,
   },
   titleWrap: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
   },
   questionText: {
     color: '#2A0D45',
     fontSize: 21,
-    lineHeight: 29,
+    lineHeight: 28,
     fontWeight: '900',
     textAlign: 'center',
+  },
+  questionTextSmall: {
+    fontSize: 18,
+    lineHeight: 24,
   },
   highlightText: {
     color: '#D81B60',
@@ -167,12 +181,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   footer: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 16,
-    backgroundColor: colors.background,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(252, 231, 243, 0.6)',
+    paddingVertical: 8,
+    backgroundColor: 'transparent',
   },
   arrowIcon: {
     color: '#FFFFFF',

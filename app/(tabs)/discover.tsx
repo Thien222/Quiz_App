@@ -9,6 +9,7 @@ import { colors, gradients, radius, shadows, spacing, typography } from '@/const
 import { characterGenderAssets, uiAssets } from '@/constants/assets';
 import { useUserStore } from '@/stores/useUserStore';
 import { pickGenderAsset } from '@/utils/genderAsset';
+import { useResponsiveLayout } from '@/utils/responsive';
 
 interface QuizItem {
   id: string;
@@ -24,6 +25,11 @@ export default function Discover() {
   const router = useRouter();
   const genderTheme = useUserStore((state) => state.genderTheme);
   const heroCharacter = pickGenderAsset(characterGenderAssets, genderTheme);
+  const { isSmallPhone, getGridItemWidth } = useResponsiveLayout();
+
+  const columns = 2;
+  const gridGap = isSmallPhone ? 8 : 12;
+  const cardWidth = getGridItemWidth(columns, gridGap);
 
   const quizzes: QuizItem[] = [
     {
@@ -77,7 +83,7 @@ export default function Discover() {
         </View>
       </View>
 
-      {/* 2. Top Hero Discovery Banner (60% text, 40% art, no text overlap) */}
+      {/* 2. Top Hero Discovery Banner (Flexible text & art, no text overlap) */}
       <Pressable
         onPress={() => router.push('/quiz/love-style')}
         style={({ pressed }) => [styles.bannerWrapper, pressed && styles.cardPressed]}
@@ -90,11 +96,13 @@ export default function Discover() {
         >
           <View style={styles.bannerTextZone}>
             <Badge
-              label="DÀNH RIÊNG CHO BẠN"
+              label="DÀNH CHO BẠN"
               variant="pearl"
               icon={<Ionicons name="heart" size={10} color={colors.primaryDark} />}
             />
-            <Text style={styles.bannerTitle}>Hiểu trái tim mình qua từng câu hỏi nhỏ</Text>
+            <Text style={[styles.bannerTitle, isSmallPhone && styles.bannerTitleSmall]}>
+              Hiểu trái tim mình qua từng câu hỏi nhỏ
+            </Text>
             <Text style={styles.bannerSub}>Biên tập riêng cho bạn trẻ Gen-Z</Text>
           </View>
           <View style={styles.bannerArtZone}>
@@ -114,15 +122,21 @@ export default function Discover() {
         style={styles.sectionHeader}
       />
 
-      {/* 4. Normalized 2-Column Grid */}
-      <View style={styles.grid}>
+      {/* 4. Calculated Dynamic Grid */}
+      <View style={[styles.grid, { gap: gridGap }]}>
         {quizzes.map((quiz) => (
           <Pressable
             key={quiz.id}
+            accessibilityRole="button"
+            accessibilityLabel={quiz.title}
             onPress={() => router.push(quiz.href as any)}
-            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+            style={({ pressed }) => [
+              styles.card,
+              { width: cardWidth },
+              pressed && styles.cardPressed,
+            ]}
           >
-            {/* Standard Image Wrap (120px height, centered contain, top-right badge) */}
+            {/* Standard Image Wrap (aspectRatio contain, top-right badge) */}
             <View style={styles.imageWrap}>
               <Image source={quiz.image} resizeMode="contain" style={styles.cardImage} />
               <View style={styles.badgeWrap}>
@@ -132,10 +146,10 @@ export default function Discover() {
 
             {/* Standard Title & Subtitle */}
             <View style={styles.cardContent}>
-              <Text numberOfLines={2} style={styles.cardTitle}>
+              <Text style={[styles.cardTitle, isSmallPhone && styles.cardTitleSmall]}>
                 {quiz.title}
               </Text>
-              <Text numberOfLines={2} style={styles.cardSub}>
+              <Text style={styles.cardSub}>
                 {quiz.subtitle}
               </Text>
             </View>
@@ -198,11 +212,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
-    minHeight: 155,
+    minHeight: 145,
     overflow: 'hidden',
   },
   bannerTextZone: {
-    width: '60%',
+    flex: 1.3,
+    minWidth: 0,
     paddingRight: spacing.xs,
     justifyContent: 'center',
     gap: spacing.xs,
@@ -213,14 +228,19 @@ const styles = StyleSheet.create({
     lineHeight: 23,
     fontWeight: '900',
   },
+  bannerTitleSmall: {
+    fontSize: 15.5,
+    lineHeight: 20,
+  },
   bannerSub: {
     ...typography.caption,
     fontSize: 12,
     color: colors.textSecondary,
   },
   bannerArtZone: {
-    width: '40%',
-    height: 130,
+    flex: 0.9,
+    aspectRatio: 1,
+    maxHeight: 130,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -235,12 +255,9 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: spacing.md,
   },
   card: {
-    width: '48.2%',
-    minHeight: 260,
+    minHeight: 240,
     borderRadius: radius.card,
     backgroundColor: '#FFFFFF',
     padding: spacing.xs,
@@ -249,8 +266,15 @@ const styles = StyleSheet.create({
     ...shadows.card,
     justifyContent: 'space-between',
   },
+  cardTitleSmall: {
+    fontSize: 13.5,
+    lineHeight: 18,
+  },
   imageWrap: {
-    height: 120,
+    width: '100%',
+    aspectRatio: 1.3,
+    maxHeight: 125,
+    minHeight: 85,
     borderRadius: radius.md,
     backgroundColor: '#FFF0F6',
     alignItems: 'center',
@@ -289,6 +313,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xs,
   },
   cardActionPill: {
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

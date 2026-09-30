@@ -22,7 +22,7 @@ export function Badge({ label, variant = 'pink', icon, style }: BadgeProps) {
       case 'green':
         return {
           container: { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' },
-          text: { color: colors.success },
+          text: { color: '#047857' },
         };
       case 'peach':
         return {
@@ -60,11 +60,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
     alignSelf: 'flex-start',
+    maxWidth: '100%',
+    flexShrink: 1,
   },
   iconWrap: {
     marginRight: 4,
   },
   text: {
     ...typography.badge,
+    flexShrink: 1,
   },
 });

@@ -1,25 +1,36 @@
+import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { AppDialog } from '@/components/common/AppDialog';
+import type { UnlockedInsight } from '@/types/quiz';
 import { Image, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/common/AppHeader';
 import { GradientCTAButton } from '@/components/common/GradientCTAButton';
 import { ResultMetricBar } from '@/components/result/ResultMetricBar';
 import { ResultInsightCard } from '@/components/result/ResultInsightCard';
 import { LockedInsightCard } from '@/components/result/LockedInsightCard';
-import { colors, gradients, shadows } from '@/constants/theme';
+import { ScreenContainer } from '@/components/common/ScreenContainer';
+import { colors, shadows } from '@/constants/theme';
 import { uiAssets } from '@/constants/assets';
 import { useQuizStore } from '@/stores/useQuizStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { pickGenderAsset } from '@/utils/genderAsset';
 import { archetypes } from '@/data/archetypes';
+import { useResponsiveLayout } from '@/utils/responsive';
 
 export default function ResultScreen() {
   const router = useRouter();
+  const [selectedInsight, setSelectedInsight] = useState<UnlockedInsight | null>(null);
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
 
   const currentResult = useQuizStore((state) => state.currentResult);
   const genderTheme = useUserStore((state) => state.genderTheme);
+  const {
+    isSmallPhone,
+    isTablet,
+    contentWidth,
+    getGridItemWidth,
+    getCarouselItemWidth,
+  } = useResponsiveLayout();
 
   // Fallback nếu người dùng F5 hoặc vào thẳng link
   const result = currentResult || {
@@ -44,124 +55,173 @@ export default function ResultScreen() {
     });
   };
 
+  // Responsive calculations
+  const cardInnerWidth = contentWidth - 35;
+  const metricColumns = isSmallPhone ? 1 : 2;
+  const metricGap = 8;
+  const metricBarWidth = getGridItemWidth(metricColumns, metricGap, cardInnerWidth);
+
+  const carouselGap = 10;
+  const visibleCards = isTablet ? 3.15 : 1.8;
+  const insightCardWidth = getCarouselItemWidth(visibleCards, carouselGap);
+  const characterSize = isSmallPhone ? 95 : 120;
+
   return (
-    <SafeAreaView style={styles.screen}>
-      <AppHeader
-        title="Nè Bạn Ơi ♥"
-        onBack={() => router.replace('/(tabs)')}
-        onShare={handleShare}
-      />
+    <ScreenContainer
+      edges={['top', 'bottom']}
+      header={
+        <AppHeader
+          title="Nè Bạn Ơi ♥"
+          onBack={() => router.replace('/(tabs)')}
+          onShare={handleShare}
+        />
+      }
+      contentContainerStyle={styles.content}
+    >
+      {/* Title Header with floating hearts */}
+      <View style={styles.titleSection}>
+        <Text style={[styles.resultMainTitle, isSmallPhone && styles.resultMainTitleSmall]}>
+          Kết quả của bạn ✨
+        </Text>
+        <Text style={styles.resultSubTitle}>
+          Đây là kết quả dựa trên những lựa chọn của bạn 💗
+        </Text>
+      </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Title Header with floating hearts */}
-        <View style={styles.titleSection}>
-          <Text style={styles.resultMainTitle}>Kết quả của bạn ✨</Text>
-          <Text style={styles.resultSubTitle}>
-            Đây là kết quả dựa trên những lựa chọn của bạn 💗
-          </Text>
+      {/* Hero Archetype Big Card (Ref: 04_result_kawaii.png) */}
+      <View style={styles.archetypeCard}>
+        <View style={styles.archetypeHeaderRow}>
+          <View style={styles.archetypeTag}>
+            <Text style={styles.archetypeTagText}>💗 Bạn là kiểu:</Text>
+          </View>
         </View>
 
-        {/* Hero Archetype Big Card (Ref: 04_result_kawaii.png) */}
-        <View style={styles.archetypeCard}>
-          <View style={styles.archetypeHeaderRow}>
-            <View style={styles.archetypeTag}>
-              <Text style={styles.archetypeTagText}>💗 Bạn là kiểu:</Text>
-            </View>
+        <View style={styles.heroLayoutRow}>
+          <View style={styles.heroTextCol}>
+            <Text style={[styles.archetypeTitle, isSmallPhone && styles.archetypeTitleSmall]}>
+              {result.archetype.title.toUpperCase()}
+            </Text>
+            <Text style={styles.archetypeSummary}>{result.archetype.summary}</Text>
           </View>
 
-          <View style={styles.heroLayoutRow}>
-            <View style={styles.heroTextCol}>
-              <Text style={styles.archetypeTitle}>{result.archetype.title.toUpperCase()}</Text>
-              <Text style={styles.archetypeSummary}>{result.archetype.summary}</Text>
-            </View>
-
-            {heroCharacter ? (
-              <View style={styles.characterWrap}>
-                <Image source={heroCharacter} resizeMode="contain" style={styles.characterImg} />
-                <View style={styles.speechTag}>
-                  <Text style={styles.speechTagText}>{result.archetype.quote}</Text>
-                </View>
+          {heroCharacter ? (
+            <View
+              style={[
+                styles.characterWrap,
+                { width: characterSize, height: characterSize },
+              ]}
+            >
+              <Image
+                source={heroCharacter}
+                resizeMode="contain"
+                style={styles.characterImg}
+              />
+              <View style={styles.speechTag}>
+                <Text style={styles.speechTagText} numberOfLines={2}>
+                  {result.archetype.quote}
+                </Text>
               </View>
-            ) : null}
-          </View>
-
-          {/* 4 Dimension Metric Bars Grid */}
-          <View style={styles.metricsGrid}>
-            {result.metrics.map((metric) => (
-              <ResultMetricBar key={metric.key} metric={metric} />
-            ))}
-          </View>
+            </View>
+          ) : null}
         </View>
 
-        {/* Section 1: Bạn đã mở miễn phí 🎉 */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>🎁 Bạn đã mở miễn phí 🎉</Text>
-          <Text style={styles.sectionSub}>Đây là những nội dung bạn có thể xem ngay nè!</Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalScroll}
-        >
-          {result.archetype.freeInsights.map((insight) => (
-            <ResultInsightCard key={insight.id} insight={insight} />
-          ))}
-        </ScrollView>
-
-        {/* Section 2: Còn 4 mục nữa đang chờ bạn 💜 */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>🔒 Còn 4 mục nữa đang chờ bạn 💜</Text>
-          <Text style={styles.sectionSub}>
-            Mở khóa để khám phá trọn bộ kết quả chi tiết và thú vị hơn!
-          </Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalScroll}
-        >
-          {result.archetype.lockedInsights.map((insight) => (
-            <LockedInsightCard
-              key={insight.id}
-              insight={insight}
-              onPress={() => router.push('/premium')}
+        {/* 4 Dimension Metric Bars Grid */}
+        <View style={[styles.metricsGrid, { gap: metricGap }]}>
+          {result.metrics.map((metric) => (
+            <ResultMetricBar
+              key={metric.key}
+              metric={metric}
+              style={{ width: metricBarWidth }}
             />
           ))}
-        </ScrollView>
-
-        {/* Big Premium CTA Banner (Ref: 04_result_kawaii.png) */}
-        <View style={styles.actionsWrap}>
-          <GradientCTAButton
-            label="Mở khóa toàn bộ kết quả"
-            icon={
-              <Image
-                source={uiAssets.illustrations.crown}
-                resizeMode="contain"
-                style={styles.crownIcon}
-              />
-            }
-            showChevron
-            onPress={() => router.push('/premium')}
-            style={styles.mainCta}
-          />
-          <Text style={styles.pricingHint}>Chỉ từ 10.000đ hoặc VIP Pass 49.000đ</Text>
-
-          <GradientCTAButton
-            label="Về trang chủ"
-            variant="pearl"
-            onPress={() => router.replace('/(tabs)')}
-          />
         </View>
+      </View>
+
+      {/* Section 1: Bạn đã mở miễn phí 🎉 */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>🎁 Bạn đã mở miễn phí 🎉</Text>
+        <Text style={styles.sectionSub}>Đây là những nội dung bạn có thể xem ngay nè!</Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={insightCardWidth + carouselGap}
+        decelerationRate="fast"
+        contentContainerStyle={[styles.horizontalScroll, { gap: carouselGap }]}
+      >
+        {result.archetype.freeInsights.map((insight) => (
+          <ResultInsightCard
+            key={insight.id}
+            insight={insight}
+            onPress={() => setSelectedInsight(insight)}
+            style={{ width: insightCardWidth }}
+          />
+        ))}
       </ScrollView>
-    </SafeAreaView>
+
+      {/* Section 2: Còn 4 mục nữa đang chờ bạn 💜 */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>🔒 Còn {result.archetype.lockedInsights.length} mục đang chờ bạn</Text>
+        <Text style={styles.sectionSub}>
+          Mở khóa để khám phá trọn bộ kết quả chi tiết và thú vị hơn!
+        </Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={insightCardWidth + carouselGap}
+        decelerationRate="fast"
+        contentContainerStyle={[styles.horizontalScroll, { gap: carouselGap }]}
+      >
+        {result.archetype.lockedInsights.map((insight) => (
+          <LockedInsightCard
+            key={insight.id}
+            insight={insight}
+            onPress={() => router.push('/premium')}
+            style={{ width: insightCardWidth }}
+          />
+        ))}
+      </ScrollView>
+
+      {/* Big Premium CTA Banner (Ref: 04_result_kawaii.png) */}
+      <AppDialog visible={selectedInsight !== null} title={selectedInsight?.title ?? ''} onClose={() => setSelectedInsight(null)}>
+        <Text style={styles.insightDescription}>{selectedInsight?.description}</Text>
+      </AppDialog>
+      <View style={styles.actionsWrap}>
+        <GradientCTAButton
+          label="Mở khóa toàn bộ kết quả"
+          icon={
+            <Image
+              source={uiAssets.illustrations.crown}
+              resizeMode="contain"
+              style={styles.crownIcon}
+            />
+          }
+          showChevron
+          onPress={() => router.push('/premium')}
+          style={styles.mainCta}
+        />
+        <Text style={styles.pricingHint}>Chỉ từ 10.000đ hoặc VIP Pass 49.000đ</Text>
+
+        <GradientCTAButton
+          label="Về trang chủ"
+          variant="pearl"
+          onPress={() => router.replace('/(tabs)')}
+        />
+      </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: { paddingHorizontal: 16, paddingTop: 6, paddingBottom: 40, gap: 16 },
+  insightDescription: { color: colors.textSecondary, fontSize: 16, lineHeight: 25 },
+  content: {
+    paddingTop: 6,
+    paddingBottom: 40,
+    gap: 16,
+  },
   titleSection: {
     alignItems: 'center',
     gap: 4,
@@ -172,14 +232,18 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: -0.5,
   },
+  resultMainTitleSmall: {
+    fontSize: 23,
+  },
   resultSubTitle: {
     color: colors.textSecondary,
     fontSize: 12.5,
     fontWeight: '600',
+    textAlign: 'center',
   },
   archetypeCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 30,
+    borderRadius: 28,
     borderWidth: 1.5,
     borderColor: '#FCE7F3',
     padding: 16,
@@ -209,13 +273,18 @@ const styles = StyleSheet.create({
   },
   heroTextCol: {
     flex: 1,
-    gap: 8,
+    minWidth: 0,
+    gap: 6,
   },
   archetypeTitle: {
     color: '#F43F5E',
-    fontSize: 26,
-    lineHeight: 31,
+    fontSize: 25,
+    lineHeight: 30,
     fontWeight: '900',
+  },
+  archetypeTitleSmall: {
+    fontSize: 20,
+    lineHeight: 25,
   },
   archetypeSummary: {
     color: colors.textSecondary,
@@ -224,10 +293,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   characterWrap: {
-    width: 120,
-    height: 120,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   characterImg: {
     width: '100%',
@@ -242,6 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#FCE7F3',
+    maxWidth: 130,
   },
   speechTagText: {
     color: colors.primaryDark,
@@ -252,7 +321,6 @@ const styles = StyleSheet.create({
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 9,
     marginTop: 4,
   },
   sectionHeader: {
@@ -269,13 +337,13 @@ const styles = StyleSheet.create({
     fontSize: 11.5,
   },
   horizontalScroll: {
-    gap: 10,
     paddingVertical: 4,
   },
   actionsWrap: {
     marginTop: 8,
     gap: 8,
     alignItems: 'center',
+    width: '100%',
   },
   mainCta: {
     width: '100%',

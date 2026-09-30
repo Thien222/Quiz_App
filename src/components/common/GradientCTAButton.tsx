@@ -98,6 +98,7 @@ export function GradientCTAButton({
   return (
     <AnimatedPressable
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
       onPressIn={handlePressIn}
@@ -164,8 +165,8 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   sizeLg: {
-    minHeight: 62,
-    paddingHorizontal: 28,
+    minHeight: 56,
+    paddingHorizontal: 20,
   },
   sizeMd: {
     minHeight: 52,
@@ -176,10 +177,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   contentRow: {
+    maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    flexShrink: 1,
+    paddingVertical: 6,
   },
   iconWrap: {
     alignItems: 'center',
@@ -192,6 +196,8 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: '900',
     letterSpacing: -0.2,
+    flexShrink: 1,
+    textAlign: 'center',
   },
   fontLg: {
     fontSize: 18,

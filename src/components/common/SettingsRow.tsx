@@ -49,6 +49,7 @@ export function SettingsRow({
   if (onPress) {
     return (
       <Pressable
+        accessibilityRole="button"
         onPress={onPress}
         style={({ pressed }) => [
           styles.container,
@@ -84,6 +85,7 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
+    minWidth: 0,
     justifyContent: 'center',
   },
   title: {
@@ -98,6 +100,7 @@ const styles = StyleSheet.create({
   },
   right: {
     marginLeft: spacing.xs,
+    flexShrink: 0,
   },
   divider: {
     height: 1,

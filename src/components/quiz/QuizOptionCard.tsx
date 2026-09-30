@@ -37,6 +37,7 @@ export function QuizOptionCard({ text, selected, thumbnail, onPress }: Props) {
     <AnimatedPressable
       accessibilityRole="radio"
       accessibilityState={{ checked: selected }}
+      aria-checked={selected}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

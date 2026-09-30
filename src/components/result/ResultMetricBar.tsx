@@ -1,34 +1,31 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import type { DimensionMetric } from '@/types/quiz';
 import { colors } from '@/constants/theme';
 
 interface Props {
   metric: DimensionMetric;
+  style?: ViewStyle;
 }
 
-export function ResultMetricBar({ metric }: Props) {
-  const clampedScore = Math.min(100, Math.max(10, metric.score));
+export function ResultMetricBar({ metric, style }: Props) {
+  const clampedScore = Math.min(100, Math.max(0, metric.score));
 
   return (
-    <View style={styles.card}>
-      <View style={styles.iconBubble}>
-        <Text style={styles.iconText}>{metric.iconName || '💗'}</Text>
+    <View style={[styles.card, style]}>
+      <View style={styles.row}>
+        <View style={styles.iconBubble}>
+          <Text style={styles.iconText}>{metric.iconName || '💗'}</Text>
+        </View>
+        <Text style={styles.score}>{metric.score}</Text>
       </View>
-
-      <View style={styles.content}>
-        <View style={styles.row}>
-          <Text style={styles.label}>{metric.label}</Text>
-          <Text style={styles.score}>{metric.score}</Text>
-        </View>
-
-        <View style={styles.track}>
-          <View
-            style={[
-              styles.fill,
-              { width: `${clampedScore}%`, backgroundColor: metric.color },
-            ]}
-          />
-        </View>
+      <Text style={styles.label}>{metric.label}</Text>
+      <View
+        accessibilityRole="progressbar"
+        accessibilityLabel={metric.label}
+        accessibilityValue={{ min: 0, max: 100, now: clampedScore }}
+        style={styles.track}
+      >
+        <View style={[styles.fill, { width: `${clampedScore}%`, backgroundColor: metric.color }]} />
       </View>
     </View>
   );
@@ -36,10 +33,7 @@ export function ResultMetricBar({ metric }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    width: '48.5%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    gap: 8,
     padding: 12,
     borderRadius: 20,
     backgroundColor: '#FFFFFF',
@@ -52,26 +46,25 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   iconBubble: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#FFF0F7',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   iconText: {
-    fontSize: 20,
-  },
-  content: {
-    flex: 1,
+    fontSize: 18,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginBottom: 6,
+    alignItems: 'center',
   },
   label: {
+    minHeight: 36,
+    lineHeight: 18,
     color: colors.text,
     fontSize: 12,
     fontWeight: '800',
@@ -80,6 +73,7 @@ const styles = StyleSheet.create({
     color: '#3B1C54',
     fontSize: 14,
     fontWeight: '900',
+    flexShrink: 0,
   },
   track: {
     height: 6,

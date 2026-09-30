@@ -9,19 +9,29 @@ import { SoftCard } from '@/components/common/SoftCard';
 import { colors, gradients, radius, shadows, spacing, typography } from '@/constants/theme';
 import { characterGenderAssets, uiAssets } from '@/constants/assets';
 import { useUserStore } from '@/stores/useUserStore';
+import { useQuizStore } from '@/stores/useQuizStore';
 import { pickGenderAsset } from '@/utils/genderAsset';
+import { useResponsiveLayout } from '@/utils/responsive';
 
 export default function HomeScreen() {
   const router = useRouter();
   const genderTheme = useUserStore((state) => state.genderTheme);
   const heroCharacter = pickGenderAsset(characterGenderAssets, genderTheme);
+  const { isSmallPhone, isCompactPhone } = useResponsiveLayout();
+  const nickname = useUserStore((state) => state.nickname);
+  const canResume = useQuizStore((state) => state.status === 'in_progress' && state.activeQuestions.length > 0);
+  const today = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
 
   return (
     <ScreenContainer>
       {/* 1. Header (Brand left, clean system actions right) */}
       <View style={styles.brandRow}>
         <View style={styles.brandLeft}>
-          <Image source={uiAssets.illustrations.glossyHeart} style={styles.brandArtwork} />
+          <Image
+            source={uiAssets.illustrations.glossyHeart}
+            style={styles.brandArtwork}
+            resizeMode="contain"
+          />
           <View style={styles.brandCopy}>
             <Text style={styles.brandTitle}>Nè Bạn Ơi</Text>
             <Text style={styles.brandTagline}>Những điều nhỏ xinh cho tình yêu</Text>
@@ -48,13 +58,15 @@ export default function HomeScreen() {
 
       {/* 2. Compact Greeting */}
       <View style={styles.greeting}>
-        <Text style={styles.hello}>Chào bạn ✨</Text>
+        <Text style={styles.hello}>Chào {nickname || 'bạn'} ✨</Text>
         <Text style={styles.greetingCopy}>Hôm nay mình cùng khám phá thêm một chút về trái tim nhé.</Text>
       </View>
 
-      {/* 3. Featured Hero Card (58% text, 42% art, gender-aware, no text overlap) */}
+      {/* 3. Featured Hero Card (Flexible text/art zones, gender-aware, no text overlap) */}
       <Pressable
-        onPress={() => router.push('/quiz/love-style')}
+        accessibilityRole="button"
+        accessibilityLabel={canResume ? 'Tiếp tục quiz đang làm' : 'Bạn yêu như thế nào? Làm quiz ngay'}
+        onPress={() => router.push(canResume ? '/quiz/play' : '/quiz/love-style')}
         style={({ pressed }) => [styles.heroWrapper, pressed && styles.cardPressed]}
       >
         <LinearGradient
@@ -63,25 +75,27 @@ export default function HomeScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.heroCard}
         >
-          {/* Left Text Zone (58%) */}
+          {/* Left Text Zone */}
           <View style={styles.heroTextZone}>
             <Badge
               label="BÀI NỔI BẬT"
               variant="pearl"
               icon={<Ionicons name="sparkles" size={11} color={colors.primaryDark} />}
             />
-            <Text style={styles.heroTitle}>Bạn yêu như thế nào?</Text>
+            <Text style={[styles.heroTitle, isSmallPhone && styles.heroTitleSmall]}>
+              Bạn yêu như thế nào?
+            </Text>
             <Text style={styles.heroSub}>
               Khám phá phong cách yêu, điểm đáng yêu & gu người thương.
             </Text>
 
             <View style={styles.startPill}>
-              <Text style={styles.startText}>Làm ngay</Text>
+              <Text style={styles.startText}>{canResume ? 'Làm tiếp' : 'Làm ngay'}</Text>
               <Ionicons name="chevron-forward" size={14} color="#FFFFFF" />
             </View>
           </View>
 
-          {/* Right Art Zone (42%) */}
+          {/* Right Art Zone */}
           <View style={styles.heroArtZone}>
             <Image
               source={heroCharacter}
@@ -95,7 +109,7 @@ export default function HomeScreen() {
       {/* 4. Daily Card Section */}
       <SectionTitle
         title="Gói hôm nay"
-        rightElement={<Text style={styles.dateLabel}>29.09</Text>}
+        rightElement={<Text style={styles.dateLabel}>{today}</Text>}
         style={styles.sectionHeader}
       />
 
@@ -128,7 +142,7 @@ export default function HomeScreen() {
           colors={gradients.premiumCard}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          style={styles.premiumCard}
+          style={[styles.premiumCard, isCompactPhone && styles.premiumCardCompact]}
         >
           <View style={styles.crownBox}>
             <Image
@@ -137,11 +151,11 @@ export default function HomeScreen() {
               style={styles.crownArtwork}
             />
           </View>
-          <View style={styles.premiumCopy}>
+          <View style={[styles.premiumCopy, isCompactPhone && styles.premiumCopyCompact]}>
             <Text style={styles.premiumTitle}>Mở khóa toàn bộ</Text>
             <Text style={styles.premiumSub}>Xem mọi phân tích chuyên sâu</Text>
           </View>
-          <View style={styles.pricePill}>
+          <View style={[styles.pricePill, isCompactPhone && styles.pricePillCompact]}>
             <Text style={styles.priceText}>49.000đ</Text>
             <Ionicons name="chevron-forward" size={13} color="#FFFFFF" />
           </View>
@@ -162,6 +176,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+    flex: 1,
   },
   brandArtwork: {
     width: 36,
@@ -169,6 +184,7 @@ const styles = StyleSheet.create({
   },
   brandCopy: {
     justifyContent: 'center',
+    flex: 1,
   },
   brandTitle: {
     ...typography.cardTitle,
@@ -187,8 +203,8 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   headerBtn: {
-    width: 38,
-    height: 38,
+    width: 44,
+    height: 44,
     borderRadius: radius.pill,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
@@ -224,11 +240,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
-    minHeight: 180,
+    minHeight: 175,
     overflow: 'hidden',
   },
   heroTextZone: {
-    width: '58%',
+    flex: 1.25,
+    minWidth: 0,
     paddingRight: spacing.xs,
     justifyContent: 'center',
     gap: spacing.xs,
@@ -239,6 +256,10 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: '900',
   },
+  heroTitleSmall: {
+    fontSize: 18,
+    lineHeight: 23,
+  },
   heroSub: {
     ...typography.caption,
     fontSize: 12,
@@ -246,8 +267,9 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   heroArtZone: {
-    width: '42%',
-    height: 155,
+    flex: 0.85,
+    aspectRatio: 1,
+    maxHeight: 155,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -300,6 +322,7 @@ const styles = StyleSheet.create({
   },
   dailyTextWrap: {
     flex: 1,
+    minWidth: 0,
   },
   dailyKicker: {
     color: colors.primaryDark,
@@ -346,6 +369,7 @@ const styles = StyleSheet.create({
   },
   premiumCopy: {
     flex: 1,
+    minWidth: 0,
   },
   premiumTitle: {
     ...typography.body,
@@ -367,6 +391,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: radius.pill,
     gap: 4,
+    flexShrink: 0,
   },
   priceText: {
     color: '#FFFFFF',
@@ -377,6 +402,9 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
     opacity: 0.92,
   },
+  premiumCardCompact: { flexWrap: 'wrap' },
+  premiumCopyCompact: { flexBasis: '70%' },
+  pricePillCompact: { marginLeft: 52 },
   pressed: {
     opacity: 0.75,
   },

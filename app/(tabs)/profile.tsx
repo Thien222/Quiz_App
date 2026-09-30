@@ -48,35 +48,42 @@ export default function ProfileScreen() {
       {/* 3. Section: Hồ sơ của bạn */}
       <SectionTitle title="Hồ sơ của bạn" style={styles.sectionHeader} />
       <View style={styles.cardContainer}>
-        <SettingsRow
-          title="Chủ đề nhân vật"
-          subtitle="Tùy biến hình ảnh hiển thị theo gu"
-          icon={<Ionicons name="color-palette-outline" size={20} color={colors.primaryDark} />}
-          showDivider
-          rightElement={
-            <View style={styles.genderChipsRow}>
-              {(['female', 'male', 'neutral'] as GenderTheme[]).map((theme) => (
-                <Pressable
-                  key={theme}
-                  onPress={() => setGenderTheme(theme)}
+        <View style={styles.themeSettingBlock}>
+          <View style={styles.themeHeaderRow}>
+            <View style={styles.themeIconBox}>
+              <Ionicons name="color-palette-outline" size={20} color={colors.primaryDark} />
+            </View>
+            <View style={styles.themeCopy}>
+              <Text style={styles.themeTitle}>Chủ đề nhân vật</Text>
+              <Text style={styles.themeSubtitle}>Tùy biến hình ảnh hiển thị theo gu</Text>
+            </View>
+          </View>
+          <View style={styles.genderChipsRow}>
+            {(['female', 'male', 'neutral'] as GenderTheme[]).map((theme) => (
+              <Pressable
+                key={theme}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: genderTheme === theme }}
+                aria-checked={genderTheme === theme}
+                onPress={() => setGenderTheme(theme)}
+                style={[
+                  styles.chip,
+                  genderTheme === theme && styles.chipActive,
+                ]}
+              >
+                <Text
                   style={[
-                    styles.chip,
-                    genderTheme === theme && styles.chipActive,
+                    styles.chipText,
+                    genderTheme === theme && styles.chipTextActive,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.chipText,
-                      genderTheme === theme && styles.chipTextActive,
-                    ]}
-                  >
-                    {genderLabels[theme]}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          }
-        />
+                  {genderLabels[theme]}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+        <View style={styles.divider} />
         <SettingsRow
           title="Trạng thái tình cảm"
           subtitle="Đang hẹn hò ngọt ngào"
@@ -205,14 +212,17 @@ const styles = StyleSheet.create({
   },
   profileMeta: {
     flex: 1,
+    minWidth: 0,
     justifyContent: 'center',
   },
   nameRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: spacing.xs,
   },
   nickname: {
+    flexShrink: 1,
     ...typography.cardTitle,
     fontSize: 18,
     fontWeight: '900',
@@ -237,24 +247,66 @@ const styles = StyleSheet.create({
   },
   genderChipsRow: {
     flexDirection: 'row',
-    gap: 4,
+    gap: 8,
+    marginTop: spacing.xs,
+  },
+  themeSettingBlock: {
+    padding: spacing.md,
+  },
+  themeHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  themeIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.md,
+    backgroundColor: '#FFF0F7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
+  themeCopy: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: 'center',
+  },
+  themeTitle: {
+    ...typography.body,
+    color: colors.text,
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  themeSubtitle: {
+    ...typography.caption,
+    marginTop: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginLeft: 58,
   },
   chip: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    flex: 1,
+    minHeight: 44,
+    paddingVertical: 7,
+    paddingHorizontal: 4,
     borderRadius: radius.pill,
     backgroundColor: '#FFF5F8',
     borderWidth: 1,
     borderColor: '#FCE7F3',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   chipActive: {
     backgroundColor: '#FFE4E6',
     borderColor: colors.primaryDark,
   },
   chipText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.textSecondary,
+    textAlign: 'center',
   },
   chipTextActive: {
     color: colors.primaryDark,

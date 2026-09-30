@@ -37,8 +37,10 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    height: 175,
-    borderRadius: 28,
+    aspectRatio: 16 / 9,
+    maxHeight: 220,
+    minHeight: 130,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',

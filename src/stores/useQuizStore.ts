@@ -31,7 +31,6 @@ export const useQuizStore = create<QuizState>()(
           activeQuestions: questions,
           currentIndex: 0,
           answers: {},
-          currentResult: null,
           status: 'in_progress',
         }),
 

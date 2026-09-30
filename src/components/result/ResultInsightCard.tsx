@@ -1,24 +1,27 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { colors } from '@/constants/theme';
 import type { UnlockedInsight } from '@/types/quiz';
 
 interface Props {
   insight: UnlockedInsight;
   onPress?: () => void;
+  style?: ViewStyle;
 }
 
-export function ResultInsightCard({ insight, onPress }: Props) {
+export function ResultInsightCard({ insight, onPress, style }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.card, style, pressed && styles.pressed]}
     >
       <View style={styles.iconBubble}>
         <Text style={styles.icon}>{insight.icon}</Text>
       </View>
 
-      <Text style={styles.title}>{insight.title}</Text>
+      <Text numberOfLines={2} style={styles.title}>
+        {insight.title}
+      </Text>
       <Text numberOfLines={2} style={styles.subtitle}>
         {insight.subtitle}
       </Text>
@@ -34,8 +37,7 @@ export function ResultInsightCard({ insight, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 140,
-    minHeight: 165,
+    minHeight: 160,
     borderRadius: 24,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
@@ -72,8 +74,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.textSecondary,
-    fontSize: 10.5,
-    lineHeight: 14,
+    fontSize: 11,
+    lineHeight: 15,
     marginTop: 3,
   },
   actionWrap: {

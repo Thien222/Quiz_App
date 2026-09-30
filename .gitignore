@@ -2,6 +2,11 @@ node_modules/
 .expo/
 dist/
 web-build/
+artifacts/
+test-results/
+playwright-report/
+ui-before.png
+.serena/
 *.log
 .env
 .env.*

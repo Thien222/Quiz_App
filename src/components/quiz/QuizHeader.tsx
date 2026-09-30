@@ -42,10 +42,10 @@ export function QuizHeader({ current, total, onBack }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 12,
-    gap: 12,
+    paddingHorizontal: 0,
+    paddingTop: 4,
+    paddingBottom: 8,
+    gap: 10,
   },
   topRow: {
     flexDirection: 'row',

@@ -1,7 +1,9 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, shadows } from '@/constants/theme';
+import { useResponsiveLayout } from '@/utils/responsive';
 
 type IoniconName = keyof typeof Ionicons.glyphMap;
 
@@ -26,14 +28,28 @@ function TabIcon({
 }
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+  const { isTablet } = useResponsiveLayout();
+
+  const bottomInset = insets.bottom > 0 ? insets.bottom : 8;
+  const tabBarHeight = 62 + bottomInset;
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primaryDark,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            height: tabBarHeight,
+            paddingBottom: bottomInset,
+          },
+          isTablet && styles.tabletTabBar,
+        ],
         tabBarLabelStyle: styles.tabBarLabel,
+        tabBarLabelPosition: 'below-icon',
         tabBarItemStyle: styles.tabBarItem,
       }}
     >
@@ -79,13 +95,18 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 68,
     backgroundColor: '#FFFFFF',
     borderTopColor: colors.border,
     borderTopWidth: 1,
     paddingTop: 6,
-    paddingBottom: 8,
     ...shadows.soft,
+  },
+  tabletTabBar: {
+    width: '100%',
+    alignSelf: 'center',
+    maxWidth: 700,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   tabBarItem: {
     paddingVertical: 2,
@@ -94,6 +115,9 @@ const styles = StyleSheet.create({
   },
   tabBarLabel: {
     fontSize: 11,
+    lineHeight: 16,
+    minHeight: 18,
+    flexShrink: 0,
     fontWeight: '700',
     marginTop: 2,
   },

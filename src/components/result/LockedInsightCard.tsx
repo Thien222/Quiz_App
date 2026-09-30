@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/constants/theme';
 import type { LockedInsight } from '@/types/quiz';
@@ -6,14 +6,15 @@ import type { LockedInsight } from '@/types/quiz';
 interface Props {
   insight: LockedInsight;
   onPress: () => void;
+  style?: ViewStyle;
 }
 
-export function LockedInsightCard({ insight, onPress }: Props) {
+export function LockedInsightCard({ insight, onPress, style }: Props) {
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.card, style, pressed && styles.pressed]}
     >
       <LinearGradient
         colors={['#FFE6F2', '#EFE8FF']}
@@ -38,7 +39,6 @@ export function LockedInsightCard({ insight, onPress }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 130,
     minHeight: 145,
     borderRadius: 22,
     backgroundColor: '#FFFFFF',
@@ -58,7 +58,9 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     width: '100%',
-    height: 85,
+    aspectRatio: 1.4,
+    maxHeight: 90,
+    minHeight: 65,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',

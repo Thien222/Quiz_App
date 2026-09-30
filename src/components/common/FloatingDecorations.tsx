@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 export function FloatingDecorations() {
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <View aria-hidden pointerEvents="none" style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}>
       <Text style={[styles.symbol, styles.one]}>✦</Text>
       <Text style={[styles.symbol, styles.two]}>♡</Text>
       <Text style={[styles.symbol, styles.three]}>✧</Text>

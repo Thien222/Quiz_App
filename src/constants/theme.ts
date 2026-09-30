@@ -9,7 +9,7 @@ export const colors = {
   peach: '#FDBA74',
   text: '#3B1C54',
   textSecondary: '#7E638D',
-  textMuted: '#AFA0BA',
+  textMuted: '#806F8B',
   border: '#FCE7F3',
   lavenderBorder: '#F3E8FF',
   gold: '#F59E0B',

@@ -283,23 +283,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
   },
   contentRow: {
+    maxWidth: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   sizeSm: {
-    height: 38,
+    minHeight: 38,
+    paddingVertical: 6,
     paddingHorizontal: spacing.md,
   },
   sizeMd: {
-    height: 46,
+    minHeight: 46,
+    paddingVertical: 8,
     paddingHorizontal: spacing.lg,
   },
   sizeLg: {
-    height: 52,
+    minHeight: 52,
+    paddingVertical: 10,
     paddingHorizontal: spacing.xl,
   },
   primaryText: {
+    flexShrink: 1,
+    textAlign: 'center',
     color: '#FFFFFF',
     fontWeight: '800',
     letterSpacing: 0.3,
@@ -312,6 +318,8 @@ const styles = StyleSheet.create({
     borderColor: '#E9D5FF',
   },
   secondaryText: {
+    flexShrink: 1,
+    textAlign: 'center',
     color: colors.purple,
     fontWeight: '700',
   },
@@ -324,6 +332,8 @@ const styles = StyleSheet.create({
     ...shadows.soft,
   },
   outlineText: {
+    flexShrink: 1,
+    textAlign: 'center',
     color: colors.primaryDark,
     fontWeight: '700',
   },
@@ -351,6 +361,8 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
   },
   textBtn: {
+    minHeight: 44,
+    justifyContent: 'center',
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
     alignItems: 'center',

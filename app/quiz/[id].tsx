@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '@/components/common/AppHeader';
 import { Badge } from '@/components/common/Badge';
 import { PrimaryButton } from '@/components/common/Buttons';
+import { ScreenContainer } from '@/components/common/ScreenContainer';
 import { colors, gradients, radius, shadows, spacing, typography } from '@/constants/theme';
 import { uiAssets } from '@/constants/assets';
 import { useUserStore } from '@/stores/useUserStore';
 import { useQuizStore } from '@/stores/useQuizStore';
 import { selectQuizQuestions } from '@/features/quiz/questionSelector';
+import { useResponsiveLayout } from '@/utils/responsive';
 import type { GenderTheme } from '@/types/quiz';
 
 const previewOptions = [
@@ -49,6 +50,7 @@ export default function QuizIntroScreen() {
 
   const { genderTheme, setGenderTheme, seenQuestionIds } = useUserStore();
   const startSession = useQuizStore((state) => state.startSession);
+  const { isSmallPhone } = useResponsiveLayout();
 
   const [previewSelected, setPreviewSelected] = useState<number | null>(0);
 
@@ -63,31 +65,40 @@ export default function QuizIntroScreen() {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={styles.screen}>
-      <View style={styles.header}>
-        <AppHeader title="Bạn yêu như thế nào?" onBack={() => router.back()} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* 1. Hero Artwork Banner */}
-        <LinearGradient
-          colors={gradients.heroCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.hero}
-        >
-          <Image
-            source={uiAssets.generated.onboardingCouple}
-            resizeMode="contain"
-            style={styles.heroArtwork}
+    <ScreenContainer
+      edges={['top', 'bottom']}
+      header={<AppHeader title="Bạn yêu như thế nào?" onBack={() => router.back()} />}
+      footer={
+        <View style={styles.footerCTA}>
+          <PrimaryButton
+            label="Bắt đầu làm quiz"
+            icon={<Ionicons name="play" size={16} color="#FFFFFF" />}
+            showChevron
+            onPress={handleStart}
           />
-          <View style={styles.freeBadgeWrap}>
-            <Badge label="FREE" variant="green" />
-          </View>
-          <View style={styles.speechBubble}>
-            <Text style={styles.speechText}>Yêu là hiểu{`\n`}mình hơn{`\n`}mỗi ngày ♡</Text>
-          </View>
-        </LinearGradient>
+        </View>
+      }
+      contentContainerStyle={styles.content}
+    >
+      {/* 1. Hero Artwork Banner */}
+      <LinearGradient
+        colors={gradients.heroCard}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.hero}
+      >
+        <Image
+          source={uiAssets.generated.onboardingCouple}
+          resizeMode="contain"
+          style={styles.heroArtwork}
+        />
+        <View style={styles.freeBadgeWrap}>
+          <Badge label="FREE" variant="green" />
+        </View>
+        <View style={styles.speechBubble}>
+          <Text style={styles.speechText}>Yêu là hiểu{`\n`}mình hơn{`\n`}mỗi ngày ♡</Text>
+        </View>
+      </LinearGradient>
 
         {/* 2. Lead Summary */}
         <View style={styles.leadCard}>
@@ -133,6 +144,9 @@ export default function QuizIntroScreen() {
             ].map((item) => (
               <Pressable
                 key={item.key}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: genderTheme === item.key }}
+                aria-checked={genderTheme === item.key}
                 onPress={() => setGenderTheme(item.key as GenderTheme)}
                 style={[
                   styles.genderChip,
@@ -194,6 +208,9 @@ export default function QuizIntroScreen() {
             {previewOptions.map((opt, idx) => (
               <Pressable
                 key={opt.text}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: previewSelected === idx }}
+                aria-checked={previewSelected === idx}
                 onPress={() => setPreviewSelected(idx)}
                 style={[
                   styles.previewItem,
@@ -209,7 +226,6 @@ export default function QuizIntroScreen() {
                   {previewSelected === idx ? <View style={styles.radioDot} /> : null}
                 </View>
                 <Text
-                  numberOfLines={1}
                   style={[
                     styles.previewText,
                     previewSelected === idx && styles.previewTextActive,
@@ -221,37 +237,21 @@ export default function QuizIntroScreen() {
             ))}
           </View>
         </View>
-      </ScrollView>
-
-      {/* 7. Bottom Fixed CTA */}
-      <View style={styles.footerCTA}>
-        <PrimaryButton
-          label="Bắt đầu làm quiz"
-          icon={<Ionicons name="play" size={16} color="#FFFFFF" />}
-          showChevron
-          onPress={handleStart}
-        />
-      </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    paddingHorizontal: spacing.md,
-  },
   content: {
-    paddingHorizontal: spacing.md,
     paddingTop: spacing.xs,
-    paddingBottom: 80,
+    paddingBottom: spacing.lg,
     gap: spacing.md,
   },
   hero: {
-    height: 230,
+    width: '100%',
+    aspectRatio: 16 / 10,
+    maxHeight: 220,
+    minHeight: 160,
     borderRadius: radius.hero,
     overflow: 'hidden',
     alignItems: 'center',
@@ -261,9 +261,9 @@ const styles = StyleSheet.create({
     ...shadows.hero,
   },
   heroArtwork: {
-    width: 290,
-    height: 290,
-    marginTop: spacing.md,
+    width: '85%',
+    height: '85%',
+    aspectRatio: 1,
   },
   freeBadgeWrap: {
     position: 'absolute',
@@ -315,9 +315,10 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
+    minWidth: 0,
     alignItems: 'center',
     paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xxs,
+    paddingHorizontal: 2,
     borderRadius: radius.md,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -337,11 +338,14 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontWeight: '800',
     color: colors.text,
+    fontSize: 12,
+    textAlign: 'center',
   },
   statSub: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: colors.textMuted,
     marginTop: 1,
+    textAlign: 'center',
   },
   genderCard: {
     backgroundColor: '#FFFFFF',
@@ -363,6 +367,8 @@ const styles = StyleSheet.create({
   },
   genderChip: {
     flex: 1,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingVertical: 10,
     borderRadius: radius.pill,
     backgroundColor: '#FFF5F8',
@@ -375,6 +381,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryDark,
   },
   genderChipText: {
+    textAlign: 'center',
     fontSize: 12,
     fontWeight: '700',
     color: colors.textSecondary,
@@ -393,6 +400,8 @@ const styles = StyleSheet.create({
   },
   discoverHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.sm,
@@ -516,15 +525,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   footerCTA: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.lg,
-    backgroundColor: 'rgba(255, 247, 249, 0.95)',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+    paddingVertical: spacing.xs,
+    backgroundColor: 'transparent',
   },
 });

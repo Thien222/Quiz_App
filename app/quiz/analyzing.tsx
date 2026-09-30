@@ -10,12 +10,13 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { colors, gradients } from '@/constants/theme';
-import { characterGenderAssets, uiAssets } from '@/constants/assets';
+import { colors } from '@/constants/theme';
+import { characterGenderAssets } from '@/constants/assets';
 import { useUserStore } from '@/stores/useUserStore';
 import { useQuizStore } from '@/stores/useQuizStore';
 import { calculateQuizResult } from '@/features/quiz/scoring';
 import { pickGenderAsset } from '@/utils/genderAsset';
+import { useResponsiveLayout } from '@/utils/responsive';
 
 const analyzingSteps = [
   'Đang đọc vị trái tim bạn... 💗',
@@ -27,6 +28,7 @@ const analyzingSteps = [
 
 export default function QuizAnalyzingScreen() {
   const router = useRouter();
+  const { width, height, isSmallPhone } = useResponsiveLayout();
 
   const genderTheme = useUserStore((state) => state.genderTheme);
   const { activeQuestions, answers, setResult } = useQuizStore();
@@ -84,23 +86,45 @@ export default function QuizAnalyzingScreen() {
   }, []);
 
   const mascotSource = pickGenderAsset(characterGenderAssets, genderTheme);
+  const mascotSize = Math.min(width * 0.55, height * 0.28, 220);
 
   return (
     <LinearGradient colors={['#FFF5F8', '#F6EFFE', '#FFF0F5']} style={styles.screen}>
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView edges={['top', 'bottom']} style={styles.safe}>
         <View style={styles.content}>
           {/* Animated Mascot */}
-          <View style={styles.mascotWrapper}>
-            <View style={styles.glow} />
-            <Animated.View style={[styles.mascotCard, animatedStyle]}>
-              <Image source={mascotSource} resizeMode="contain" style={styles.mascotArtwork} />
+          <View style={[styles.mascotWrapper, { width: mascotSize, height: mascotSize }]}>
+            <View
+              style={[
+                styles.glow,
+                {
+                  width: mascotSize * 0.95,
+                  height: mascotSize * 0.95,
+                  borderRadius: mascotSize * 0.48,
+                },
+              ]}
+            />
+            <Animated.View
+              style={[
+                styles.mascotCard,
+                { width: mascotSize * 0.9, height: mascotSize * 0.9 },
+                animatedStyle,
+              ]}
+            >
+              <Image
+                source={mascotSource}
+                resizeMode="contain"
+                style={styles.mascotArtwork}
+              />
             </Animated.View>
           </View>
 
           {/* Title and Rotating Status */}
           <View style={styles.textWrap}>
-            <Text style={styles.title}>Nè bạn ơi ✨</Text>
-            <Text style={styles.statusText}>{analyzingSteps[stepIndex]}</Text>
+            <Text style={[styles.title, isSmallPhone && styles.titleSmall]}>Nè bạn ơi ✨</Text>
+            <Text style={[styles.statusText, isSmallPhone && styles.statusTextSmall]}>
+              {analyzingSteps[stepIndex]}
+            </Text>
           </View>
 
           {/* Cute Loading Dots */}
@@ -123,39 +147,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-    gap: 20,
+    gap: 18,
   },
   mascotWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 240,
-    height: 240,
   },
   glow: {
     position: 'absolute',
-    width: 220,
-    height: 220,
-    borderRadius: 110,
     backgroundColor: 'rgba(244, 114, 182, 0.25)',
   },
   mascotCard: {
-    width: 210,
-    height: 210,
     alignItems: 'center',
     justifyContent: 'center',
   },
   mascotArtwork: {
     width: '100%',
     height: '100%',
+    aspectRatio: 1,
   },
   textWrap: {
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
+    paddingHorizontal: 12,
   },
   title: {
     color: colors.text,
     fontSize: 26,
     fontWeight: '900',
+  },
+  titleSmall: {
+    fontSize: 22,
   },
   statusText: {
     color: '#D81B60',
@@ -164,10 +186,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     minHeight: 24,
   },
+  statusTextSmall: {
+    fontSize: 14,
+  },
   dots: {
     flexDirection: 'row',
     gap: 8,
-    marginTop: 8,
+    marginTop: 6,
   },
   dot: {
     width: 10,
